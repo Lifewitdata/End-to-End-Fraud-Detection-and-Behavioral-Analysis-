@@ -115,7 +115,8 @@ def _run_into(input_path=None, output_dir="outputs", demo=False, config_path=Non
         queue.to_csv(out/"alert_queue.csv", index=False)
         con.register("test_frame",test)
         con.execute("CREATE OR REPLACE TABLE test_scored AS SELECT * FROM test_frame")
-        con.register("rule_registry",pd.read_csv(ROOT/"config/rule_registry.csv"))
+        con.register("rule_registry_input",pd.read_csv(ROOT/"config/rule_registry.csv"))
+        con.execute("CREATE OR REPLACE TABLE rule_registry AS SELECT * FROM rule_registry_input")
         con.execute((ROOT/"sql/monitoring.sql").read_text())
         for table in ["hourly_monitoring", "recipient_investigation", "rule_performance"]:
             con.execute(f"SELECT * FROM {table}").df().to_csv(out/f"{table}.csv",index=False)

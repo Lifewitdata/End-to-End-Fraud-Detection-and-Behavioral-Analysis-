@@ -92,6 +92,10 @@ def test_pipeline_sql_and_python_agree(completed):
     for r in rules.index:
         assert rules.loc[r,"alerts"]==policies.loc[r,"alerts"]
         assert rules.loc[r,"true_positives"]==policies.loc[r,"tp"]
+    # The delivered database can rerun the SQL after the Python connection closes.
+    with duckdb.connect(str(out/"fraud.duckdb")) as con:
+        con.execute((ROOT/"sql/monitoring.sql").read_text())
+        assert con.execute("SELECT COUNT(*) FROM rule_registry").fetchone()[0]==4
     assert scored.row_id.is_unique
     assert manifest["splits"]["validation"]["last_step"]<manifest["splits"]["test"]["first_step"]
     assert "INTEGRATION FIXTURE" in manifest["mode"]
