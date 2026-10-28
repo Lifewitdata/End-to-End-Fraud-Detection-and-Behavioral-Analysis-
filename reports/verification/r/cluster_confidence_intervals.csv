@@ -1,0 +1,5 @@
+"metric","lower","upper","valid_replicates","clusters","method"
+"precision",0.0314530854004135,0.0437413797583896,500,400,"Recipient-cluster percentile bootstrap, 95%"
+"recall",0.85662915851272,0.947795262816353,500,400,"Recipient-cluster percentile bootstrap, 95%"
+"false_positive_rate",0.72971401816409,0.755353626552013,500,400,"Recipient-cluster percentile bootstrap, 95%"
+"value_recall",0.883185005074075,0.985981587416199,500,400,"Recipient-cluster percentile bootstrap, 95%"

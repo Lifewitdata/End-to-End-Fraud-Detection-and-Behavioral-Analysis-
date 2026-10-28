@@ -1,0 +1,2 @@
+"test","statistic","p_value","cramers_v","interpretation"
+"Transaction type vs fraud: Monte Carlo chi-square",79.2743926621742,5e-04,0.130177627736811,"Exploratory association; repeated-account dependence and simulator design limit inference"

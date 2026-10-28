@@ -1,0 +1,8 @@
+{
+  "source_input_sha256": "3adcf48b8b06d380b64ca368bde6088b0f5774357d920c551e2e43ab0872c4bf",
+  "test_csv_md5": "9d84cc3c52efd16ffe8d5178ff6ba774",
+  "selected_model": "logistic_regression",
+  "threshold": 0.23278792048862101,
+  "rows": 4678,
+  "mode": "INTEGRATION FIXTURE — NOT PAYSIM RESULTS"
+}

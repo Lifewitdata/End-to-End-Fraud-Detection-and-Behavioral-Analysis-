@@ -27,6 +27,29 @@ Alternatively, open `outputs/dashboard.html` in a browser after a run. It is a
 self-contained interactive Plotly report that works without a server or CDN.
 Use the Streamlit app for queue filtering and CSV downloads.
 
+## R statistical analysis
+
+An independent R layer uses **dplyr, ggplot2, jsonlite and base R statistics** to
+reconstruct detection rules, reconcile Python metrics, calculate recipient-cluster
+bootstrap confidence intervals, analyse transaction-type associations and generate
+three charts. Model and threshold remain frozen; no test-label retuning occurs.
+
+```bash
+Rscript -e 'install.packages(c("dplyr", "ggplot2", "jsonlite"), repos="https://cloud.r-project.org")'
+Rscript r/test_validation.R
+Rscript r/validate_fraud.R outputs
+```
+
+See [R setup and limitations](r/README.md). Outputs appear under `outputs/r/` and
+in the dashboard's Decision brief tab when available. CI executes the R checks
+and retains its reports and plots with the Python evidence. `tidymodels` is not
+used or claimed. Fixture analysis remains explicitly labelled as fixture results.
+
+[Executed R validation report](reports/verification/r/validation_report.md) ·
+[Python/R metric reconciliation](reports/verification/r/python_r_parity.csv)
+
+![R fraud-rate analysis on the integration fixture](reports/verification/r/fraud_rate_by_type.png)
+
 For the actual dataset, follow [data acquisition](data/README.md), then run:
 
 ```bash
@@ -100,6 +123,7 @@ scored files and fitted binaries are generated locally and excluded from Git.
 - `config/`: rule registry, thresholds and explicit economic assumptions
 - `dashboard/app.py`: working Streamlit dashboard
 - `tests/`: temporal, metric, SQL parity and pipeline checks
+- `r/`: independent metric reconciliation, statistical analysis and ggplot2 charts
 - `reports/`: methodology, operations and verification evidence
 - `.github/workflows/ci.yml`: automated integration verification
 
