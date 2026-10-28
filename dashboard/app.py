@@ -1,6 +1,7 @@
 """Run from project root: python -m streamlit run dashboard/app.py"""
 import json
 import os
+import hashlib
 from pathlib import Path
 import pandas as pd
 import plotly.express as px
@@ -22,6 +23,14 @@ def load(path,stamp):
 def read(name):
     path=out/name
     return load(str(path),path.stat().st_mtime_ns)
+
+@st.cache_data
+def file_md5(path,stamp):
+    digest=hashlib.md5()
+    with open(path,"rb") as f:
+        for chunk in iter(lambda:f.read(1024*1024),b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 pages=st.tabs(["Overview","Investigation queue","Rule & model evaluation","Drift & data quality","Decision brief"])
 with pages[0]:
@@ -62,3 +71,20 @@ with pages[3]:
     st.json(manifest)
 with pages[4]:
     st.markdown((out/"stakeholder_brief.md").read_text())
+    r_dir=out/"r"
+    metadata_path=r_dir/"validation_metadata.json"
+    r_current=False
+    if metadata_path.exists():
+        meta=json.loads(metadata_path.read_text())
+        scored_path=out/"test_scored.csv"
+        r_current=(meta.get("source_input_sha256")==manifest["input_sha256"] and
+                   meta.get("test_csv_md5")==file_md5(str(scored_path),scored_path.stat().st_mtime_ns))
+    if (r_dir/"validation_report.md").exists() and r_current:
+        st.subheader("Independent R statistical validation")
+        st.markdown((r_dir/"validation_report.md").read_text())
+        st.dataframe(read("r/cluster_confidence_intervals.csv"),hide_index=True)
+        st.dataframe(read("r/python_r_parity.csv"),hide_index=True)
+        for chart in ["fraud_rate_by_type.png","policy_outcomes.png","metric_uncertainty.png"]:
+            st.image(str(r_dir/chart))
+    else:
+        st.info("R analysis is absent or belongs to an earlier run. Run Rscript r/validate_fraud.R with this output directory.")

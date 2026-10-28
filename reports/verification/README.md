@@ -11,6 +11,11 @@ Completed locally:
 - Streamlit AppTest verified all five tabs, four KPI cards and transaction-type filtering.
 - Python compilation and Git whitespace checks passed.
 - SQL monitoring totals and rule-performance joins reconciled with Python metrics.
+- R independently passed 157 Python/R metric comparisons, 500 recipient-cluster
+  bootstrap resamples across 400 recipients, unit checks and an integration check
+  that rejects a deliberately corrupted reference metric. See [R evidence](r/validation_report.md).
+- The dashboard was checked with valid R outputs and with mismatched metadata;
+  it hides stale R evidence and asks for a fresh analysis.
 
 The fixture intentionally has overlapping classes. The selected model exceeds
 peak review capacity on its test window, so the generated brief recommends against

@@ -17,6 +17,20 @@ jobs:
       - run: python scripts/execute_notebook.py
       - name: Dashboard smoke check
         run: python -c "from streamlit.testing.v1 import AppTest; a=AppTest.from_file('dashboard/app.py').run(timeout=60); assert not a.exception"
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+          use-public-rspm: true
+      - name: Install R analysis packages
+        run: Rscript -e 'install.packages(c("dplyr", "ggplot2", "jsonlite"))'
+      - name: Verify R statistics and Python parity
+        run: |
+          Rscript r/test_validation.R
+          Rscript r/validate_fraud.R outputs
+          Rscript r/test_integration.R outputs
+          cat outputs/r/validation_report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Dashboard with R evidence
+        run: python -c "from streamlit.testing.v1 import AppTest; a=AppTest.from_file('dashboard/app.py').run(timeout=60); assert not a.exception; assert any(x.value=='Independent R statistical validation' for x in a.subheader)"
       - uses: actions/upload-artifact@v4
         with:
           name: integration-fixture-evidence-not-paysim
@@ -25,3 +39,4 @@ jobs:
             outputs/*.json
             outputs/*.md
             outputs/dashboard.html
+            outputs/r/

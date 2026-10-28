@@ -1,0 +1,3 @@
+"outcome","transactions","median_amount","q25","q75","total_amount"
+"Labelled fraud",145,11911.33,3246.78,42394.79,5285315.48
+"Legitimate",4533,7981.23,2928.63,21563.21,108055603.8
