@@ -1,0 +1,9 @@
+feature,psi,status
+log_amount,0.0024192342678254226,Stable
+sender_count_24h,0.0007056937314676222,Stable
+sender_mean_24h,0.003176223616913839,Stable
+recipient_count_24h,0.00486417800053611,Stable
+recipient_senders_24h,0.004853864819255305,Stable
+recipient_mean_24h,0.01389934520903474,Stable
+sender_amount_ratio,0.00403385987632461,Stable
+recipient_amount_ratio,0.005215979195923005,Stable

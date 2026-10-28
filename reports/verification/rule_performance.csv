@@ -1,0 +1,5 @@
+rule_id,description,owner,version,alerts,true_positives,false_positives,precision,captured_value
+R01_existing_flag,Existing simulator flag used only as a benchmark,Payments Risk,1.0,14,1.0,13.0,0.07142857142857142,241137.86
+R02_large_transfer_cashout,Transfer or cash-out above configured fixed amount,Payments Risk,1.0,27,2.0,25.0,0.07407407407407407,460545.29
+R03_recipient_burst,Prior-step recipient velocity and relative amount exceed configuration,Payments Risk,1.0,34,1.0,33.0,0.029411764705882353,80140.54
+R04_sender_deviation,At least three prior-step sender transactions and a relative amount spike,Payments Risk,1.0,52,7.0,45.0,0.1346153846153846,612188.83

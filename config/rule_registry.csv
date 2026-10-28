@@ -1,0 +1,5 @@
+rule_id,description,owner,version,action
+R01_existing_flag,Existing simulator flag used only as a benchmark,Payments Risk,1.0,Review
+R02_large_transfer_cashout,Transfer or cash-out above configured fixed amount,Payments Risk,1.0,Review
+R03_recipient_burst,Prior-step recipient velocity and relative amount exceed configuration,Payments Risk,1.0,Review
+R04_sender_deviation,At least three prior-step sender transactions and a relative amount spike,Payments Risk,1.0,Review
