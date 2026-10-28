@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.ipynb_checkpoints/
+data/*.csv
+data/*.zip
+*.duckdb*
+outputs/
+*.joblib
+*.egg-info/
+core
+core.*
+.fraud-build-*/

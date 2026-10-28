@@ -1,0 +1,16 @@
+{
+  "seed": 42,
+  "train_fraction": 0.6,
+  "validation_fraction": 0.2,
+  "max_train_rows": 150000,
+  "review_cost_units": 5.0,
+  "false_alert_friction_units": 2.0,
+  "action_success_fraction": 0.5,
+  "review_capacity_per_step": 100,
+  "amount_rule_threshold": 200000,
+  "recipient_velocity_threshold": 10,
+  "relative_amount_threshold": 3.0,
+  "rule_owner": "Payments Risk",
+  "rules_version": "1.0",
+  "cost_basis": "Illustrative scenario in dataset currency units; no USD/INR conversion or realized savings claim"
+}

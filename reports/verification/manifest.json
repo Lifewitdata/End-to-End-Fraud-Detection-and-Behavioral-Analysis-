@@ -1,0 +1,92 @@
+{
+  "mode": "INTEGRATION FIXTURE \u2014 NOT PAYSIM RESULTS",
+  "input_sha256": "3adcf48b8b06d380b64ca368bde6088b0f5774357d920c551e2e43ab0872c4bf",
+  "input_rows": 24000,
+  "fit_rows": 14483,
+  "selected_model": "logistic_regression",
+  "threshold": 0.23278792048862101,
+  "features": [
+    "log_amount",
+    "sender_count_24h",
+    "sender_mean_24h",
+    "recipient_count_24h",
+    "recipient_senders_24h",
+    "recipient_mean_24h",
+    "sender_amount_ratio",
+    "recipient_amount_ratio",
+    "type"
+  ],
+  "config": {
+    "seed": 42,
+    "train_fraction": 0.6,
+    "validation_fraction": 0.2,
+    "max_train_rows": 150000,
+    "review_cost_units": 5.0,
+    "false_alert_friction_units": 2.0,
+    "action_success_fraction": 0.5,
+    "review_capacity_per_step": 100,
+    "amount_rule_threshold": 200000,
+    "recipient_velocity_threshold": 10,
+    "relative_amount_threshold": 3.0,
+    "rule_owner": "Payments Risk",
+    "rules_version": "1.0",
+    "cost_basis": "Illustrative scenario in dataset currency units; no USD/INR conversion or realized savings claim"
+  },
+  "splits": {
+    "train": {
+      "rows": 14483,
+      "first_step": 1,
+      "last_step": 144,
+      "fraud": 406
+    },
+    "validation": {
+      "rows": 4839,
+      "first_step": 145,
+      "last_step": 192,
+      "fraud": 130
+    },
+    "test": {
+      "rows": 4678,
+      "first_step": 193,
+      "last_step": 240,
+      "fraud": 145
+    }
+  },
+  "python": "3.12.14",
+  "versions": {
+    "pandas": "2.2.3",
+    "numpy": "2.3.5",
+    "scikit-learn": "1.8.0",
+    "duckdb": "2.0.0"
+  },
+  "decision": "Offline triage simulation; no transaction is actually blocked or loss prevented",
+  "generated_artifacts": [
+    "alert_queue.csv",
+    "case_FN_timeline.csv",
+    "case_FP_timeline.csv",
+    "case_TP_timeline.csv",
+    "cost_sensitivity.csv",
+    "dashboard.html",
+    "data_quality.csv",
+    "drift.csv",
+    "feature_importance.csv",
+    "fraud.duckdb",
+    "hourly_chart.csv",
+    "hourly_monitoring.csv",
+    "integration_fixture.csv",
+    "investigations.md",
+    "manifest.json",
+    "model.joblib",
+    "monitoring_alerts.csv",
+    "policy_comparison.csv",
+    "ranking_metrics.csv",
+    "recipient_investigation.csv",
+    "retrospective_balances.csv",
+    "rule_performance.csv",
+    "stakeholder_brief.md",
+    "test_scored.csv",
+    "type_summary.csv",
+    "validation_models.csv",
+    "validation_thresholds.csv"
+  ]
+}

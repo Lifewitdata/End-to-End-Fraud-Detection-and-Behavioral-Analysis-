@@ -1,0 +1,3 @@
+policy,issue,owner,evidence,action
+selected_model,PEAK_CAPACITY_BREACH,Payments Risk,Peak 103 exceeds 100 per hourly step,Do not enforce; review queue capacity and validate a revised policy on a new period
+hybrid_union,PEAK_CAPACITY_BREACH,Payments Risk,Peak 103 exceeds 100 per hourly step,Do not enforce; review queue capacity and validate a revised policy on a new period

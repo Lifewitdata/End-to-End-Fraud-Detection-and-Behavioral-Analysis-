@@ -1,0 +1,12 @@
+check,value
+missing_cells,0
+unknown_types,0
+negative_amounts,0
+invalid_steps,0
+invalid_labels,0
+invalid_existing_flags,0
+empty_account_ids,0
+nonfinite_numeric,0
+duplicate_rows_preserved,0
+zero_amounts_retained,0
+rows,24000
