@@ -115,3 +115,16 @@ def test_capacity_breach_is_reported(completed):
     for name,row in policies.iterrows():
         if not row.capacity_feasible:
             assert ((alerts.policy==name)&(alerts.issue=="PEAK_CAPACITY_BREACH")).any()
+
+
+def test_transaction_reporting_and_budget_reconcile(completed):
+    out,manifest=completed
+    checks=pd.read_csv(out/'transaction_reconciliation.csv')
+    assert len(checks)==6 and checks.passed.all()
+    hourly=pd.read_csv(out/'transaction_metrics.csv')
+    assert hourly.transactions.sum()==manifest['input_rows']
+    budget=pd.read_csv(out/'review_budget_comparison.csv')
+    assert len(budget)==6 and budget.capacity_feasible.all()
+    test=budget[budget.period=='test'].sort_values('budget_fraction')
+    assert test.alerts.is_monotonic_increasing
+    assert test.missed_fraud_value.is_monotonic_decreasing

@@ -88,3 +88,18 @@ with pages[4]:
             st.image(str(r_dir/chart))
     else:
         st.info("R analysis is absent or belongs to an earlier run. Run Rscript r/validate_fraud.R with this output directory.")
+
+with pages[0]:
+    st.subheader('Transaction performance — full input period')
+    st.caption('Simulation steps are not calendar hours of day. Amounts use dataset units.')
+    st.plotly_chart(px.line(read('transaction_metrics.csv'),x='step',y='transaction_value'),width='stretch')
+    st.dataframe(read('transaction_mix.csv'),hide_index=True)
+    st.dataframe(read('activity_segments.csv'),hide_index=True)
+    st.caption('Segments use each sender\'s strictly prior 24-hour transaction count.')
+with pages[2]:
+    st.subheader('Bounded review workloads')
+    st.caption('Predeclared 1%, 5%, 10% budgets; end-of-hour batch ranking, not real-time blocking. No winner is selected on test results.')
+    st.dataframe(read('review_budget_comparison.csv'),hide_index=True)
+    st.download_button('Download illustrative 5% queue',read('bounded_review_queue.csv').to_csv(index=False),'bounded_review_queue.csv','text/csv')
+with pages[3]:
+    st.dataframe(read('transaction_reconciliation.csv'),hide_index=True)
