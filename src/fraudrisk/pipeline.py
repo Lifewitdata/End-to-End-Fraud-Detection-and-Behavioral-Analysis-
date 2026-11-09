@@ -6,22 +6,35 @@ import json
 import platform
 import os
 import tempfile
+import time
+import uuid
+import gc
+from datetime import datetime, timezone
+try:
+    import resource
+except ImportError:
+    resource=None
 from pathlib import Path
 import duckdb
 import joblib
 import numpy as np
 import pandas as pd
+import pyarrow as pa
 from .data import make_demo, validate
 from .evaluation import FEATURES, NUMERIC, fit_models, time_split, metrics, select_threshold, ranking_metrics, rule_flags, psi
 from .reporting import write_reports
+from .operations import write_operations
 
 ROOT = Path(__file__).resolve().parents[2]
 
 def build_features(df, con):
     con.register("input_frame", df)
     con.execute("CREATE OR REPLACE TABLE transactions AS SELECT * FROM input_frame")
+    con.unregister("input_frame")
     con.execute((ROOT/"sql/features.sql").read_text())
-    return con.execute("SELECT * FROM features ORDER BY step, row_id").df()
+    result=con.sql("SELECT * FROM features ORDER BY step, row_id")
+    table=result.to_arrow_table() if hasattr(result,"to_arrow_table") else result.fetch_arrow_table()
+    return table.to_pandas(types_mapper=lambda t: pd.StringDtype(storage="pyarrow") if pa.types.is_string(t) else None)
 
 def run(input_path=None, output_dir="outputs", demo=False, config_path=None):
     """Build in a fresh database; publish artifacts only after a successful run."""
@@ -29,7 +42,24 @@ def run(input_path=None, output_dir="outputs", demo=False, config_path=None):
     out.parent.mkdir(parents=True,exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=".fraud-build-",dir=out.parent) as temp:
         stage=Path(temp)
-        result=_run_into(input_path,stage,demo,config_path)
+        started=time.perf_counter()
+        try:
+            result=_run_into(input_path,stage,demo,config_path)
+        except Exception as exc:
+            failures=out.parent/(out.name+"_failures")
+            failures.mkdir(parents=True,exist_ok=True)
+            evidence={"status":"FAILED","utc":datetime.now(timezone.utc).isoformat(),
+                      "error_type":type(exc).__name__,"checks":getattr(exc,"checks",{}),
+                      "row_positions":getattr(exc,"positions",{}),"published_outputs_changed":False}
+            if input_path and Path(input_path).is_file():
+                with Path(input_path).open("rb") as source:
+                    evidence["input_sha256"]=hashlib.file_digest(source,"sha256").hexdigest()
+            (failures/(uuid.uuid4().hex+".json")).write_text(json.dumps(evidence,indent=2))
+            raise
+        result["runtime_seconds"]=round(time.perf_counter()-started,3)
+        result["completed_utc"]=datetime.now(timezone.utc).isoformat()
+        result["max_rss_platform_units"]=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss if resource else None
+        result["platform"]=platform.system()
         out.mkdir(parents=True,exist_ok=True)
         previous=[]
         if (out/"manifest.json").exists():
@@ -57,11 +87,15 @@ def _run_into(input_path=None, output_dir="outputs", demo=False, config_path=Non
     if not input_path or not Path(input_path).is_file():
         raise FileNotFoundError("Supply --input data/PS_log.csv; see data/README.md. --demo is a separate synthetic integration fixture.")
     path = Path(input_path)
-    raw, dq = validate(pd.read_csv(path))
+    raw, dq = validate(pd.read_csv(path,dtype={"nameOrig":"string[pyarrow]","nameDest":"string[pyarrow]","type":"string[pyarrow]"}))
     pd.DataFrame([{"check": k, "value": v} for k,v in dq.items()]).to_csv(out/"data_quality.csv", index=False)
-    con = duckdb.connect(str(out/"fraud.duckdb"))
+    con = duckdb.connect(str(out/"fraud.duckdb"),config={"memory_limit":cfg.get("duckdb_memory_limit","768MB"),"threads":2})
     try:
+        print(f"Validated {len(raw):,} rows; building historical features",flush=True)
         df = build_features(raw, con)
+        del raw
+        gc.collect()
+        print("Features complete; fitting and evaluating models",flush=True)
         train, val, test = time_split(df, cfg)
         models, fit_rows = fit_models(train, cfg)
         choices, sweeps = [], []
@@ -167,6 +201,7 @@ def _run_into(input_path=None, output_dir="outputs", demo=False, config_path=Non
             decision="Offline triage simulation; no transaction is actually blocked or loss prevented")
         (out/"manifest.json").write_text(json.dumps(manifest,indent=2))
         write_reports(out,manifest,test,comparison,df)
+        write_operations(out,df,val,val_scores,test,scores,threshold,cfg)
         return manifest
     finally:
         con.close()
